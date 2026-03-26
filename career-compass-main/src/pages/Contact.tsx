@@ -5,10 +5,9 @@ import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import { z } from "zod";
-
 
 const contactSchema = z.object({
   name: z.string().trim().min(1, "Name is required").max(100),
@@ -17,9 +16,31 @@ const contactSchema = z.object({
   message: z.string().trim().min(1, "Message is required").max(2000),
 });
 
+interface ContactInfo {
+  email: string;
+  phone: string;
+  office_address: string;
+  off_address: string;
+}
+
 const Contact = () => {
   const { toast } = useToast();
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+  const [contactInfo, setContactInfo] = useState<ContactInfo>({
+    email: "Info@crmjobshopee.com",
+    phone: "+91 8939750730",
+    office_address: "Door no 71, Block no 151, Ezhil Nagar, Perumbakkam, Chennai, Tamil Nadu, India.",
+    off_address: "Survey No 153 Raja Gopalapuram, Cherivey, Tada Sricity, Sathyavedu TK, Thirupathy Dist, A P, India.",
+  });
+
+  useEffect(() => {
+    fetch("http://localhost:5000/admin/contact-info")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.email) setContactInfo(data);
+      })
+      .catch(() => {});
+  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -34,8 +55,6 @@ const Contact = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      
-
       <section className="bg-hero-gradient py-16">
         <div className="container mx-auto px-4 text-center">
           <motion.h1
@@ -58,31 +77,36 @@ const Contact = () => {
               Reach out to us for any queries about job listings, partnerships, or career advice. Our team is here to help!
             </p>
             <div className="space-y-4">
-              {[
-                { icon: Mail, label: "Email", value: " Info@crmjobshopee.com" },
-                { icon: Phone, label: "Phone", value: "+91 8939750730" },
-               {
-  icon: MapPin,
-  
-  
-  value: <>
-  
-    Door no 71, Block no 151, Ezhil Nagar, Perumbakkam, Chennai, Tamil Nadu, India.<br />
-     <span style={{ color: "#999", fontSize: "0.9em" }}>Off Address</span><br />
-    Survey No 153 Raja Gopalapuram, Cherivey, Tada Sricity, Sathyavedu TK, Thirupathy Dist, A P, India.
-  </>
-}
-              ].map((item) => (
-                <div key={item.label} className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
-                    <item.icon className="h-5 w-5 text-primary" />
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground">{item.label}</p>
-                    <p className="font-medium text-foreground">{item.value}</p>
-                  </div>
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <Mail className="h-5 w-5 text-primary" />
                 </div>
-              ))}
+                <div>
+                  <p className="text-sm text-muted-foreground">Email</p>
+                  <p className="font-medium text-foreground">{contactInfo.email}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <Phone className="h-5 w-5 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Phone</p>
+                  <p className="font-medium text-foreground">{contactInfo.phone}</p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                  <MapPin className="h-5 w-5 text-primary" />
+                </div>
+                <div className="space-y-1">
+                  <p className="font-medium text-foreground">{contactInfo.office_address}</p>
+                  <p className="text-sm text-muted-foreground">Off Address</p>
+                  <p className="font-medium text-foreground">{contactInfo.off_address}</p>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -126,8 +150,6 @@ const Contact = () => {
           </motion.form>
         </div>
       </section>
-
-      
 
       <ChatbotWidget />
     </div>
