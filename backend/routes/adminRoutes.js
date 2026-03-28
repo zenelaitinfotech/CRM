@@ -12,12 +12,12 @@ import {
   deleteApplication,
   getAboutContent,
   updateAboutContent
-} from "../Controllers/adminController.js";
+} from "../controllers/adminController.js";
 
 import {
   getContactInfoController,
   updateContactInfoController,
-} from "../Controllers/contactController.js";
+} from "../controllers/contactController.js";
  
 
 const router = express.Router();
