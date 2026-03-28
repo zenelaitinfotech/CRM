@@ -28,8 +28,8 @@ const Index = () => {
   const [showDropdown, setShowDropdown] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
-  const [viewJob, setViewJob] = useState<string | null>(null);
-  const [applyJobId, setApplyJobId] = useState<string | null>(null);
+  const [viewJob, setViewJob] = useState<any>(null);
+  const [applyJob, setApplyJob] = useState<any>(null);
 
   // ✅ Read hero from localStorage (admin edited)
   const homeHero = JSON.parse(localStorage.getItem("homeHero") || "null");
@@ -80,25 +80,26 @@ const Index = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleApply = (jobId: string) => {
-    if (!user) {
-      openAuthModal(jobId);
-      return;
-    }
-    setApplyJobId(jobId);
-  };
+  const handleApply = (job: any) => {
+  if (!user) {
+    openAuthModal(job.id);
+    return;
+  }
+  setApplyJob(job);
+};
 
-  if (user && pendingApplyJobId && !applyJobId) {
-    setApplyJobId(pendingApplyJobId);
+  if (user && pendingApplyJobId && !applyJob) {
+    setApplyJob(pendingApplyJobId);
     clearPendingApply();
   }
 
   // ✅ Featured jobs — admin controlled via localStorage
   const savedIds: string[] = JSON.parse(localStorage.getItem("featuredJobIds") || "[]");
   const featuredJobs = savedIds.length > 0
-    ? apiJobs.filter((job) => savedIds.includes(job._id))
-    : staticJobs.slice(0, 6);
-
+  ? apiJobs.filter((job) =>
+      savedIds.includes(job._id || job.id)
+    )
+  : apiJobs.filter((job) => job.featured === true);
   return (
     <div className="min-h-screen">
       {/* Hero */}
@@ -146,12 +147,12 @@ const Index = () => {
                   {filteredJobs.length > 0 ? (
                     filteredJobs.map((job) => (
                       <div
-                        key={job._id}
+                        key={job.id}
                         className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b last:border-0 transition-colors"
                         onClick={() => {
                           setShowDropdown(false);
                           setSearch(job.title);
-                          setViewJob(job._id);
+                          setViewJob(job);
                         }}
                       >
                         <Briefcase className="mt-1 h-4 w-4 text-primary shrink-0" />
@@ -219,7 +220,7 @@ const Index = () => {
           </h2>
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {featuredJobs.map((job) => (
-              <JobCard key={job.id} job={job} onApply={handleApply} onView={setViewJob} />
+              <JobCard key={job.id || job.id} job={job} onApply={handleApply} onView={setViewJob} />
             ))}
           </div>
           <div className="mt-8 text-center">
@@ -251,15 +252,15 @@ const Index = () => {
 
       {/* Modals — unchanged */}
       <JobDetailModal
-        job={staticJobs.find((j) => j.id === viewJob) || null}
+        job={apiJobs.find((j) => j.id === viewJob) || null}
         open={!!viewJob}
         onClose={() => setViewJob(null)}
         onApply={(id) => { setViewJob(null); handleApply(id); }}
       />
       <ApplyModal
-        jobId={applyJobId}
-        open={!!applyJobId}
-        onClose={() => setApplyJobId(null)}
+        job={applyJob}
+        open={!!applyJob}
+        onClose={() => setApplyJob(null)}
       />
     </div>
   );

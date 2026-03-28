@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 
 interface Props {
   job: Job;
-  onApply: (jobId: string) => void;
-  onView?: (jobId: string) => void;
+  onApply: (jobId: Job) => void;
+  onView?: (jobId: Job) => void;
 }
 
 const typeColor: Record<string, string> = {
@@ -25,7 +25,7 @@ export default function JobCard({ job, onApply, onView }: Props) {
           <div>
             <h3
               className="text-lg font-semibold text-foreground group-hover:text-primary transition-colors cursor-pointer"
-              onClick={() => onView?.(job.id)}
+              onClick={() => onView?.(job)}
             >
               {job.title}
             </h3>
@@ -43,8 +43,8 @@ export default function JobCard({ job, onApply, onView }: Props) {
         <p className="mb-4 line-clamp-2 text-sm text-muted-foreground">{job.description}</p>
 
         <div className="flex gap-2">
-          <Button size="sm" onClick={() => onApply(job.id)}>Apply Now</Button>
-          <Button size="sm" variant="outline" onClick={() => onView?.(job.id)}>View Details</Button>
+          <Button size="sm" onClick={() => onApply(job)}>Apply Now</Button>
+          <Button size="sm" variant="outline" onClick={() => onView?.(job)}>View Details</Button>
         </div>
       </CardContent>
     </Card>

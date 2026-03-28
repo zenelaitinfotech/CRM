@@ -12,9 +12,9 @@ router.post("/signup", async (req, res) => {
     const { name, email, password, phone, location } = req.body;
 
     // Check if email exists
-    db.query("SELECT * FROM users WHERE email = ?", [email], async (err, results) => {
+    db.query("SELECT * FROM users WHERE email =  $1", [email], async (err, results) => {
       if (err) return res.status(500).json({ message: "Database error" });
-      if (results.length > 0) return res.status(400).json({ message: "Email already exists" });
+      if (results.rows.length > 0) return res.status(400).json({ message: "Email already exists" });
 
       // Hash password
       const hashed = await bcrypt.hash(password, 10);
@@ -22,15 +22,16 @@ router.post("/signup", async (req, res) => {
       // Insert user
       const insertQuery = `
         INSERT INTO users (name, email, password, phone, location)
-        VALUES (?, ?, ?, ?, ?)
+        VALUES ($1, $2, $3, $4, $5)
       `;
       db.query(insertQuery, [name, email, hashed, phone, location], (err, result) => {
         if (err) return res.status(500).json({ message: "Database insert error" });
+        const id = result.rows[0].id;
 
         // Generate token
-        const token = jwt.sign({ id: result.insertId }, process.env.JWT_SECRET);
+        const token = jwt.sign({ id }, process.env.JWT_SECRET);
 
-        res.json({ token, user: { id: result.insertId, name, email, phone, location } });
+        res.json({ token, user: { id, name, email, phone, location } });
       });
     });
   } catch (err) {
@@ -41,11 +42,11 @@ router.post("/signup", async (req, res) => {
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  db.query("SELECT * FROM users WHERE email = ?", [email], async (err, results) => {
+  db.query("SELECT * FROM users WHERE email = $1", [email], async (err, results) => {
     if (err) return res.status(500).json({ message: "Database error" });
-    if (results.length === 0) return res.status(400).json({ message: "Invalid credentials" });
+    if (results.rows.length === 0) return res.status(400).json({ message: "Invalid credentials" });
 
-    const user = results[0];
+    const user = results.rows[0];
     const match = await bcrypt.compare(password, user.password);
     if (!match) return res.status(400).json({ message: "Invalid credentials" });
 
@@ -68,7 +69,7 @@ router.get("/applications", async (req, res) => {
   
   db.query(query, (err, results) => {
     if (err) return res.status(500).json({ message: "Database error" });
-    res.json(results);
+    res.json(results.rows);
   });
 });
 

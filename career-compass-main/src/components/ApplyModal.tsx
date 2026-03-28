@@ -5,18 +5,18 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
-import { jobs } from "@/data/jobs";
+
 import { toast } from "@/hooks/use-toast";
 
 interface Props {
-  jobId: string | null;
+  job: any;
   open: boolean;
   onClose: () => void;
 }
 
-export default function ApplyModal({ jobId, open, onClose }: Props) {
+export default function ApplyModal({ job, open, onClose }: Props) {
   const { profile } = useAuth();
-  const job = jobs.find((j) => j.id === jobId);
+  
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -42,7 +42,7 @@ export default function ApplyModal({ jobId, open, onClose }: Props) {
     e.preventDefault();
     const applications = JSON.parse(localStorage.getItem("jobshoppe_applications") || "[]");
     applications.push({
-      jobId,
+      job,
       jobTitle: job?.title,
       company: job?.company,
       name, email, phone, location, coverLetter, salary, resume,
@@ -53,7 +53,7 @@ export default function ApplyModal({ jobId, open, onClose }: Props) {
     onClose();
   };
 
-  if (!job) return null;
+  if (!job) return;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>

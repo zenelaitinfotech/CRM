@@ -100,7 +100,7 @@ export default function Jobs() {
               {dropdownJobs.length > 0 ? (
                 dropdownJobs.map((job) => (
                   <div
-                    key={job._id}
+                    key={job.id}
                     className="flex items-start gap-3 px-4 py-3 hover:bg-gray-50 cursor-pointer border-b last:border-0 transition-colors"
                     onClick={() => {
                       setShowDropdown(false);
@@ -150,10 +150,10 @@ export default function Jobs() {
       <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-3 mt-6">
         {filtered.map((job) => (
           <JobCard
-            key={job._id}
+            key={job.id}
             job={job}
-            onApply={() => setApplyJob(job)}
-            onView={() => setViewJob(job)}
+            onApply={setApplyJob}
+            onView={setViewJob}
           />
         ))}
       </div>
@@ -162,11 +162,11 @@ export default function Jobs() {
         job={viewJob}
         open={!!viewJob}
         onClose={() => setViewJob(null)}
-        onApply={() => setApplyJob(viewJob)}
+        onApply={setApplyJob}
       />
 
       <ApplyModal
-        jobId={applyJob?._id}
+        job={applyJob}
         open={!!applyJob}
         onClose={() => setApplyJob(null)}
       />

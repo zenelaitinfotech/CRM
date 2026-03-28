@@ -13,13 +13,14 @@ router.post("/:jobId/apply", protect, async (req, res) => {
 
     const sql = `
       INSERT INTO applications (job_id, candidate_id, cover_letter, expected_salary)
-      VALUES (?, ?, ?, ?)
+      VALUES ($1, $2, $3, $4)
+      RETURNING id
     `;
     db.query(sql, [jobId, candidateId, coverLetter || null, expectedSalary || null], (err, result) => {
       if (err) return res.status(500).json({ message: err.message });
 
       res.status(201).json({
-        id: result.insertId,
+        id: result.rows[0].id,
         job_id: jobId,
         candidate_id: candidateId,
         cover_letter: coverLetter,
@@ -37,7 +38,7 @@ router.get("/", async (req, res) => {
     const sql = "SELECT * FROM jobs ORDER BY created_at DESC";
     db.query(sql, (err, results) => {
       if (err) return res.status(500).json({ message: err.message });
-      res.json(results);
+      res.json(results.rows);
     });
   } catch (error) {
     res.status(500).json({ message: "Failed to fetch jobs" });
@@ -51,35 +52,41 @@ router.post("/", protect, async (req, res) => {
       return res.status(403).json({ message: "Admin only" });
     }
 
-    const { title, description, company, location, type } = req.body;
+    const { title, description, company, location, type, salary, requirements } = req.body;
+
+    // requirements arrives as an array from frontend → store as comma-separated string
+    const requirementsStr = Array.isArray(requirements)
+      ? requirements.join(",")
+      : requirements || null;
 
     const sql = `
-      INSERT INTO jobs (title, description, company, location, type)
-      VALUES (?, ?, ?, ?, ?)
+      INSERT INTO jobs (title, description, company, location, type, salary, requirements)
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
+      RETURNING id, title, description, company, location, type, salary, requirements, created_at
     `;
-    db.query(sql, [title, description, company, location, type], (err, result) => {
-      if (err) return res.status(500).json({ message: err.message });
 
-      res.status(201).json({
-        id: result.insertId,
-        title,
-        description,
-        company,
-        location,
-        type,
-      });
-    });
+    const result = await db.query(sql, [
+      title,
+      description,
+      company,
+      location,
+      type,
+      salary || null,
+      requirementsStr,
+    ]);
 
+    res.status(201).json(result.rows[0]);
   } catch (error) {
-    res.status(500).json({ message: "Job creation failed" });
+    console.error("Job creation error:", error.message);
+    res.status(500).json({ message: error.message }); // return actual pg error
   }
 });
 
 router.delete("/:id", (req, res) => {
   const { id } = req.params;
-  db.query("DELETE FROM jobs WHERE id = ?", [id], (err, result) => {
+  db.query("DELETE FROM jobs WHERE id = $1", [id], (err, result) => {
     if (err) return res.status(500).json({ error: "Failed to delete job" });
-    if (result.affectedRows === 0) return res.status(404).json({ error: "Job not found" });
+    if (result.rowCount === 0) return res.status(404).json({ error: "Job not found" });
     res.json({ message: "Job deleted successfully" });
   });
 });

@@ -15,9 +15,10 @@ import {
 } from "../Controllers/adminController.js";
 
 import {
-  getContactInfo,
-  updateContactInfo
+  getContactInfoController,
+  updateContactInfoController,
 } from "../Controllers/contactController.js";
+ 
 
 const router = express.Router();
 
@@ -42,7 +43,7 @@ router.get("/about", getAboutContent);
 router.post("/about", updateAboutContent);
 
 // Contact Info
-router.get("/contact-info", getContactInfo);
-router.put("/contact-info", updateContactInfo);
+router.get("/contact-info", getContactInfoController);
+router.put("/contact-info", updateContactInfoController);
 
 export default router;

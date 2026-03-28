@@ -22,7 +22,7 @@ export const createCandidate = (data, callback) => {
   const sql = `
     INSERT INTO users
       (name, email, password, phone, location, dob, job_title, experience, skills, resume_url, role)
-    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
   `;
 
   db.query(
@@ -40,7 +40,7 @@ export const getCandidates = (callback) => {
 
 // Get candidate by ID
 export const getCandidateById = (id, callback) => {
-  const sql = `SELECT * FROM users WHERE id = ? AND role='candidate'`;
+  const sql = `SELECT * FROM users WHERE id = $1 AND role='candidate'`;
   db.query(sql, [id], callback);
 };
 
@@ -64,8 +64,8 @@ export const updateCandidate = (id, data, callback) => {
 
   const sql = `
     UPDATE users
-    SET name=?, email=?, password=?, phone=?, location=?, dob=?, job_title=?, experience=?, skills=?, resume_url=?, role=?, updated_at=CURRENT_TIMESTAMP
-    WHERE id=? AND role='candidate'
+    SET name=$1, email=$2, password=$3, phone=$4, location=$5, dob=$6, job_title=$7, experience=$8, skills=$9, resume_url=$10, role=$11, updated_at=CURRENT_TIMESTAMP
+    WHERE id=$12 AND role='candidate'
   `;
 
   db.query(
@@ -77,6 +77,6 @@ export const updateCandidate = (id, data, callback) => {
 
 // Delete candidate
 export const deleteCandidate = (id, callback) => {
-  const sql = `DELETE FROM users WHERE id=? AND role='candidate'`;
+  const sql = `DELETE FROM users WHERE id=$1 AND role='candidate'`;
   db.query(sql, [id], callback);
 };

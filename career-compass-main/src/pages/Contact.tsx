@@ -26,6 +26,8 @@ interface ContactInfo {
 const Contact = () => {
   const { toast } = useToast();
   const [form, setForm] = useState({ name: "", email: "", subject: "", message: "" });
+
+  // Default values
   const [contactInfo, setContactInfo] = useState<ContactInfo>({
     email: "Info@crmjobshopee.com",
     phone: "+91 8939750730",
@@ -34,19 +36,34 @@ const Contact = () => {
   });
 
   useEffect(() => {
-    fetch("http://localhost:5000/admin/contact-info")
+    fetch(process.env.NODE_ENV === "production"
+      ? "https://yourapp.onrender.com/admin/contact-info"
+      : "http://localhost:5000/admin/contact-info")
       .then((r) => r.json())
       .then((data) => {
-        if (data?.email) setContactInfo(data);
+        if (data?.email && data?.phone && data?.office_address) {
+          setContactInfo({
+            email: data.email,
+            phone: data.phone,
+            office_address: data.office_address,
+            off_address: data.off_address || contactInfo.off_address,
+          });
+        }
       })
-      .catch(() => {});
+      .catch(() => {
+        console.log("Backend not reachable, showing default contact info");
+      });
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const result = contactSchema.safeParse(form);
     if (!result.success) {
-      toast({ title: "Validation Error", description: result.error.errors[0].message, variant: "destructive" });
+      toast({
+        title: "Validation Error",
+        description: result.error.errors[0].message,
+        variant: "destructive",
+      });
       return;
     }
     toast({ title: "Message Sent!", description: "We'll get back to you soon." });
@@ -62,7 +79,7 @@ const Contact = () => {
             animate={{ opacity: 1, y: 0 }}
             className="mb-4 font-display text-4xl font-bold text-primary-foreground md:text-5xl"
           >
-            Contact US
+            Contact Us
           </motion.h1>
           <p className="text-primary-foreground/80">Have questions? We'd love to hear from you.</p>
         </div>

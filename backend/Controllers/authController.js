@@ -6,12 +6,12 @@ import jwt from "jsonwebtoken";
 export const login = (req, res) => {
   const { email, password } = req.body;
 
-  const sql = "SELECT * FROM users WHERE email = ?";
+  const sql = "SELECT * FROM users WHERE email =  $1";
   db.query(sql, [email], (err, results) => {
     if (err) return res.status(500).json({ message: err.message });
     if (!results.length) return res.status(400).json({ message: "Invalid email or password" });
 
-    const user = results[0];
+    const user = results.rows[0];
 
     // Compare password
     const valid = bcrypt.compareSync(password, user.password);

@@ -16,9 +16,9 @@ export const getDashboardStats = (req, res) => {
         if (err) return res.status(500).json({ message: "Server Error" });
 
         res.json({
-          totalUsers: userResult[0].totalUsers,
-          totalJobs: jobResult[0].totalJobs,
-          totalApplications: appResult[0].totalApplications,
+          totalUsers: userResult.rows[0].totalUsers,
+          totalJobs: jobResult.rows[0].totalJobs,
+          totalApplications: appResult.rows[0].totalApplications,
         });
       });
     });
@@ -30,14 +30,14 @@ export const getUsers = (req, res) => {
   const sql = "SELECT * FROM users";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ message: "Server Error" });
-    res.json(results);
+    res.json(results.rows);
   });
 };
 
 // 3️⃣ Delete a user
 export const deleteUser = (req, res) => {
-  const sql = "DELETE FROM users WHERE id = ?";
-  db.query(sql, [req.params.id], (err, result) => {
+  const sql = "DELETE FROM users WHERE id = $1";
+  db.query(sql, [req.params.id], (err) => {
     if (err) return res.status(500).json({ message: "Server Error" });
     res.json({ message: "User deleted successfully" });
   });
@@ -45,13 +45,13 @@ export const deleteUser = (req, res) => {
 
 // 4️⃣ Toggle block/unblock user
 export const toggleUserStatus = (req, res) => {
-  const sqlGet = "SELECT isBlocked FROM users WHERE id = ?";
+  const sqlGet = "SELECT isBlocked FROM users WHERE id =  $1";
   db.query(sqlGet, [req.params.id], (err, result) => {
     if (err) return res.status(500).json({ message: "Server Error" });
-    if (!result.length) return res.status(404).json({ message: "User not found" });
+    if (result.rows.length === 0) return res.status(404).json({ message: "User not found" });
 
-    const newStatus = result[0].isBlocked ? 0 : 1;
-    const sqlUpdate = "UPDATE users SET isBlocked = ? WHERE id = ?";
+    const newStatus = result.rows[0].isBlocked ? 0 : 1;
+    const sqlUpdate = "UPDATE users SET isBlocked =  $1 WHERE id =  $2";
     db.query(sqlUpdate, [newStatus, req.params.id], (err2) => {
       if (err2) return res.status(500).json({ message: "Server Error" });
       res.json({ message: `User ${newStatus ? "blocked" : "unblocked"}` });
@@ -64,13 +64,13 @@ export const getJobs = (req, res) => {
   const sql = "SELECT * FROM jobs";
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ message: "Server Error" });
-    res.json(results);
+    res.json(results.rows);
   });
 };
 
 // 6️⃣ Delete a job
 export const deleteJob = (req, res) => {
-  const sql = "DELETE FROM jobs WHERE id = ?";
+  const sql = "DELETE FROM jobs WHERE id = $1";
   db.query(sql, [req.params.id], (err) => {
     if (err) return res.status(500).json({ message: "Server Error" });
     res.json({ message: "Job deleted successfully" });
@@ -87,13 +87,13 @@ export const getApplications = (req, res) => {
   `;
   db.query(sql, (err, results) => {
     if (err) return res.status(500).json({ message: "Server Error" });
-    res.json(results);
+    res.json(results.rows);
   });
 };
 
 // 8️⃣ Delete an application
 export const deleteApplication = (req, res) => {
-  const sql = "DELETE FROM applications WHERE id = ?";
+  const sql = "DELETE FROM applications WHERE id = $1";
   db.query(sql, [req.params.id], (err) => {
     if (err) return res.status(500).json({ message: "Server Error" });
     res.json({ message: "Application deleted successfully" });
@@ -107,7 +107,7 @@ export const getAboutContent = (req, res) => {
       return res.status(500).json(err);
     }
 
-    const data = result[0];
+    const data = result.rows[0];
 
     res.json({
       heading: data.heading,
@@ -121,7 +121,7 @@ export const updateAboutContent = (req, res) => {
   const { heading, description, values } = req.body;
 
   db.query(
-    "UPDATE about SET heading = ?, description = ?, values_json = ? WHERE id = 1",
+    "UPDATE about SET heading = $1, description = $2, values_json = $3 WHERE id = 1",
     [heading, description, JSON.stringify(values)],
     (err) => {
       if (err) {

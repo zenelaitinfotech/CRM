@@ -5,7 +5,7 @@ export const createApplication = (data, callback) => {
   const { job_id, candidate_id, cover_letter, expected_salary } = data;
   const sql = `
     INSERT INTO applications (job_id, candidate_id, cover_letter, expected_salary)
-    VALUES (?, ?, ?, ?)
+    VALUES ($1, $2, $3, $4)
   `;
   db.query(sql, [job_id, candidate_id, cover_letter, expected_salary], callback);
 };
@@ -28,7 +28,7 @@ export const getApplicationById = (id, callback) => {
     FROM applications a
     JOIN jobs j ON a.job_id = j.id
     JOIN users u ON a.candidate_id = u.id
-    WHERE a.id = ?
+    WHERE a.id =  $1
   `;
   db.query(sql, [id], callback);
 };
@@ -38,14 +38,14 @@ export const updateApplication = (id, data, callback) => {
   const { cover_letter, expected_salary } = data;
   const sql = `
     UPDATE applications
-    SET cover_letter = ?, expected_salary = ?, updated_at = CURRENT_TIMESTAMP
-    WHERE id = ?
+    SET cover_letter = $1, expected_salary = $2, updated_at = CURRENT_TIMESTAMP
+    WHERE id = $3
   `;
   db.query(sql, [cover_letter, expected_salary, id], callback);
 };
 
 // Delete application
 export const deleteApplication = (id, callback) => {
-  const sql = `DELETE FROM applications WHERE id = ?`;
+  const sql = `DELETE FROM applications WHERE id = $1`;
   db.query(sql, [id], callback);
 };

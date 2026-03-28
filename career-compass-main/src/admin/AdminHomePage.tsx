@@ -289,11 +289,11 @@ export default function AdminHomePage() {
             </div>
           ) : (
             jobs.map((job) => {
-              const isFeatured = featuredIds.includes(job._id);
+              const isFeatured = featuredIds.includes(job.id);
               return (
                 <div
-                  key={job._id}
-                  onClick={() => toggleFeatured(job._id)}
+                  key={job.id}
+                  onClick={() => toggleFeatured(job.id)}
                   className={`flex items-center justify-between px-6 py-4 cursor-pointer transition-colors ${
                     isFeatured ? "bg-green-50" : "hover:bg-gray-50"
                   }`}

@@ -9,7 +9,7 @@ interface Props {
   job: Job | null;
   open: boolean;
   onClose: () => void;
-  onApply: (jobId: string) => void;
+  onApply: (job: Job) => void;
 }
 
 export default function JobDetailModal({ job, open, onClose, onApply }: Props) {
@@ -39,13 +39,13 @@ export default function JobDetailModal({ job, open, onClose, onApply }: Props) {
           <div>
             <h4 className="mb-2 font-semibold">Requirements</h4>
             <div className="flex flex-wrap gap-2">
-              {job.requirements.map((r) => (
-                <Badge key={r} variant="secondary">{r}</Badge>
-              ))}
+             {Array.isArray(job.requirements) && job.requirements.map((r) => (
+  <Badge key={r} variant="secondary">{r}</Badge>
+))}
             </div>
           </div>
 
-          <Button className="w-full" onClick={() => onApply(job.id)}>Apply Now</Button>
+          <Button className="w-full" onClick={() => onApply(job)}>Apply Now</Button>
         </div>
       </DialogContent>
     </Dialog>

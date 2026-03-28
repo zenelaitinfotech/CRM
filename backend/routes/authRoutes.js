@@ -21,19 +21,18 @@ router.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Name, email, and password are required" });
     }
 
-    // Check if user exists
-    db.query("SELECT * FROM users WHERE email = ?", [email], async (err, results) => {
+    db.query("SELECT * FROM users WHERE email = $1", [email], async (err, result) => {
       if (err) return res.status(500).json({ message: err.message });
-      if (results.length > 0) return res.status(400).json({ message: "User already exists" });
+      if (result.rows.length > 0) return res.status(400).json({ message: "User already exists" }); // ✅ fix 1: result.rows.length
 
-      // Hash password
       const hashedPassword = await bcrypt.hash(password, 10);
       const skillsString = Array.isArray(skills) ? skills.join(",") : null;
 
       const sql = `
         INSERT INTO users (name, email, password, phone, location, dob, job_title, experience, skills, resume_url, role)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `;
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        RETURNING id
+      `; // ✅ fix 2: removed extra comma, added RETURNING id
 
       db.query(
         sql,
@@ -41,8 +40,9 @@ router.post("/register", async (req, res) => {
         (err, result) => {
           if (err) return res.status(500).json({ message: err.message });
 
-          const newUser = { id: result.insertId, name, email, role: "candidate" };
-          res.status(201).json({ user: newUser, token: generateToken(result.insertId) });
+          const id = result.rows[0].id; // ✅ fix 3: result.rows[0].id not result.insertId
+          const newUser = { id, name, email, role: "candidate" };
+          res.status(201).json({ user: newUser, token: generateToken(id) });
         }
       );
     });
@@ -52,27 +52,23 @@ router.post("/register", async (req, res) => {
   }
 });
 
+
 // ================= LOGIN =================
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ message: "Email and password required" });
 
-    db.query("SELECT * FROM users WHERE email = ?", [email], async (err, results) => {
+    db.query("SELECT * FROM users WHERE email = $1", [email], async (err, result) => {
       if (err) return res.status(500).json({ message: err.message });
-      if (results.length === 0) return res.status(400).json({ message: "Invalid email or password" });
+      if (result.rows.length === 0) return res.status(400).json({ message: "Invalid email or password" }); // ✅ fix 1
 
-      const user = results[0];
+      const user = result.rows[0]; // ✅ fix 1
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(400).json({ message: "Invalid email or password" });
 
       res.json({
-        user: {
-          id: user.id,
-          name: user.name,
-          email: user.email,
-          role: user.role,
-        },
+        user: { id: user.id, name: user.name, email: user.email, role: user.role },
         token: generateToken(user.id),
       });
     });
@@ -81,19 +77,22 @@ router.post("/login", async (req, res) => {
   }
 });
 
+
+
 // ================= UPDATE PROFILE =================
 router.put("/profile-update", protect, async (req, res) => {
   try {
-    const userId = req.user.id; // Make sure protect middleware sets req.user.id
+    const userId = req.user.id;
     const { name, email, phone, location, dob, jobTitle, experience, skills, resumeUrl } = req.body;
 
     const skillsString = Array.isArray(skills) ? skills.join(",") : skills;
 
     const sql = `
       UPDATE users
-      SET name = ?, email = ?, phone = ?, location = ?, dob = ?, job_title = ?, experience = ?, skills = ?, resume_url = ?
-      WHERE id = ?
-    `;
+      SET name = $1, email = $2, phone = $3, location = $4, dob = $5,
+          job_title = $6, experience = $7, skills = $8, resume_url = $9
+      WHERE id = $10
+    `; // ✅ fix 4: $10 for WHERE id, was $9 (duplicate)
 
     db.query(sql, [name, email, phone, location, dob, jobTitle, experience, skillsString, resumeUrl, userId], (err) => {
       if (err) return res.status(500).json({ message: err.message });
