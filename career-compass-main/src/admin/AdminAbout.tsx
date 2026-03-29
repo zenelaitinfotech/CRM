@@ -28,7 +28,7 @@ const Toast = ({ message, type }: { message: string; type: "success" | "error" }
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 const AdminAbout = () => {
-  const API = "http://localhost:5000/api/admin/about";
+  const API = "https://crm-lz8h.onrender.com/api/admin/about";
 
   const [hero,         setHero]         = useState({ heading: "", content: "", description: "" });
   const [heroOriginal, setHeroOriginal] = useState({ heading: "", content: "", description: "" });

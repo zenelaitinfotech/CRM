@@ -38,7 +38,7 @@ const Contact = () => {
   useEffect(() => {
     fetch(process.env.NODE_ENV === "production"
       ? "https://yourapp.onrender.com/admin/contact-info"
-      : "http://localhost:5000/admin/contact-info")
+      : "https://crm-lz8h.onrender.com/admin/contact-info")
       .then((r) => r.json())
       .then((data) => {
         if (data?.email && data?.phone && data?.office_address) {

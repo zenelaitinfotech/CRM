@@ -19,7 +19,7 @@ export default function Signup() {
     setError("");
 
     try {
-      await axios.post("http://localhost:5000/api/auth/register", {
+      await axios.post("https://crm-lz8h.onrender.com/api/auth/register", {
         name,
         email,
         password,

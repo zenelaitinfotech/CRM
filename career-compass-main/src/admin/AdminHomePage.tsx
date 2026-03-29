@@ -71,7 +71,7 @@ export default function AdminHomePage() {
     const fetchJobs = async () => {
       setLoadingJobs(true);
       try {
-        const res = await axios.get("http://localhost:5000/api/jobs");
+        const res = await axios.get("https://crm-lz8h.onrender.com/api/jobs");
         const data = res.data;
         if (Array.isArray(data)) setJobs(data);
         else if (Array.isArray(data.jobs)) setJobs(data.jobs);

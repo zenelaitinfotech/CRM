@@ -19,7 +19,7 @@ const AdminContact = () => {
   const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
-    fetch("http://localhost:5000/admin/contact-info")
+    fetch("https://crm-lz8h.onrender.com/admin/contact-info")
       .then((r) => r.json())
       .then((data) => {
         if (data?.email) { setInfo(data); setDraft(data); }
@@ -40,7 +40,7 @@ const AdminContact = () => {
     }
     setSaving(true);
     try {
-      const res = await fetch("http://localhost:5000/admin/contact-info", {
+      const res = await fetch("https://crm-lz8h.onrender.com/admin/contact-info", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(draft),

@@ -31,7 +31,7 @@ export default function AdminJobs() {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("http://localhost:5000/api/jobs", {
+      const res = await axios.get("https://crm-lz8h.onrender.com/api/jobs", {
         headers: { Authorization: `Bearer ${token}` },
       });
       setJobs(res.data);
@@ -50,7 +50,7 @@ export default function AdminJobs() {
     setSaving(true);
     try {
       await axios.post(
-        "http://localhost:5000/api/jobs",
+        "https://crm-lz8h.onrender.com/api/jobs",
         { ...form, requirements: form.requirements.split(",").map((r) => r.trim()) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -70,7 +70,7 @@ export default function AdminJobs() {
   if (!window.confirm("Are you sure you want to delete this job?")) return;
   setDeletingId(id);
   try {
-    await axios.delete(`http://localhost:5000/api/jobs/${id}`, {
+    await axios.delete(`https://crm-lz8h.onrender.com/api/jobs/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setJobs((prev) => prev.filter((j) => j.id !== id));

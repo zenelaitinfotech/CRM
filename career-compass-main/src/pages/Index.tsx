@@ -48,7 +48,7 @@ const Index = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await axios.get("http://localhost:5000/api/jobs");
+        const res = await axios.get("https://crm-lz8h.onrender.com/api/jobs");
         const data = res.data;
         if (Array.isArray(data)) setApiJobs(data);
         else if (Array.isArray(data.jobs)) setApiJobs(data.jobs);
