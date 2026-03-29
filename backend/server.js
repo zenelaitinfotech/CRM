@@ -15,7 +15,10 @@ dotenv.config();
 
 const app = express();
 app.use(cors({
-  origin: "http://localhost:8080", // allow your frontend dev server
+  origin: [
+    "https://crmjobshopee.com",
+    "https://www.crmjobshopee.com"
+  ], // allow your frontend dev server
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true
 }));
