@@ -17,7 +17,7 @@ import {
 import {
   getContactInfoController,
   updateContactInfoController,
-} from "../controllers/contactController.js";
+} from "../controllers/contactcontroller.js";
  
 
 const router = express.Router();
