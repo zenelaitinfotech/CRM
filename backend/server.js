@@ -17,8 +17,10 @@ const app = express();
 app.use(cors({
   origin: [
     "https://crmjobshopee.com",
-    "https://www.crmjobshopee.com"
-  ], // allow your frontend dev server
+    "https://www.crmjobshopee.com",
+    "http://localhost:8080",
+    "http://localhost:5173",
+  ],
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
   credentials: true
 }));

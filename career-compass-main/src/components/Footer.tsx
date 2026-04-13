@@ -13,7 +13,7 @@ export default function Footer() {
               <img src={logo} alt="CRM Job Shopee" className="h-8 w-8 rounded object-cover" />
               <span className="text-lg font-bold text-primary">CRM Job Shopee</span>
             </div>
-            <p className="text-sm opacity-70">Job HR CRM Consultancy For CRM Jobs</p>
+            <p className="text-sm opacity-70">Job CRM HR Consultancy Services</p>
           </div>
 
           {/* Column 2 */}
