@@ -1,6 +1,7 @@
 import logo from "@/assets/logo.jpeg";
 import { Instagram, Linkedin, Youtube, Facebook } from "lucide-react";
 import company_log from "@/assets/company_log.png";
+import { Link } from "react-router-dom";
 
 export default function Footer() {
   return (
@@ -20,9 +21,9 @@ export default function Footer() {
           <div>
             <h4 className="mb-3 font-semibold">Quick Links</h4>
             <ul className="space-y-2 text-sm opacity-70">
-              <li><a href="/" className="hover:text-primary transition-colors">Home</a></li>
-              <li><a href="/jobs" className="hover:text-primary transition-colors">Browse Jobs</a></li>
-              <li><a href="/profile" className="hover:text-primary transition-colors">My Profile</a></li>
+              <li><Link to="/" className="hover:text-primary transition-colors">Home</Link></li>
+              <li><Link to="/jobs" className="hover:text-primary transition-colors">Browse Jobs</Link></li>
+              <li><Link to="/profile" className="hover:text-primary transition-colors">My Profile</Link></li>
             </ul>
           </div>
 
@@ -44,8 +45,6 @@ export default function Footer() {
               <Instagram size={30} className="text-pink-500" />
               <Youtube size={30} className="text-red-500" />
               <Facebook size={30} className="text-blue-500" />
-
-              {/* X (Twitter) Official SVG */}
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 width="26"
@@ -57,8 +56,6 @@ export default function Footer() {
                 <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-4.714-6.231-5.401 6.231H2.744l7.737-8.835L1.254 2.25H8.08l4.253 5.622L18.244 2.25zm-1.161 17.52h1.833L7.084 4.126H5.117L17.083 19.77z" />
               </svg>
             </div>
-
-            {/* Developed By */}
             <div className="flex items-center justify-start gap-2 mt-6 opacity-100">
               <span className="text-lg font-semibold">Developed by</span>
               <img src={company_log} alt="company logo" className="h-8 w-auto" />
