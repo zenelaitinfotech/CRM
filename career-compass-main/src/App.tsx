@@ -27,6 +27,7 @@ import AdminJobs      from "./admin/AdminJobs";
 import AdminAbout     from "./admin/AdminAbout";
 import AdminContact   from "./admin/AdminContact";
 import AdminHomePage from "./admin/AdminHomePage";
+import AdminApplications from "./admin/AdminApplications";
 
 const queryClient = new QueryClient();
 
@@ -88,7 +89,8 @@ const AppContent = () => {
         >
           <Route index          element={<AdminDashboard />} />
           <Route path="jobs"    element={<AdminJobs />} />
-           <Route path="homepage" element={<AdminHomePage />} /> 
+          <Route path="applications" element={<AdminApplications />} />
+          <Route path="homepage" element={<AdminHomePage />} /> 
           <Route path="about"   element={<AdminAbout />} />
           <Route path="contact" element={<AdminContact />} />
           <Route path="profile" element={<Profile />} />

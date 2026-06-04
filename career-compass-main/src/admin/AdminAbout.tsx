@@ -26,9 +26,11 @@ const Toast = ({ message, type }: { message: string; type: "success" | "error" }
   </div>
 );
 
+import { API_URL } from "../config";
+
 // ── Main ──────────────────────────────────────────────────────────────────────
 const AdminAbout = () => {
-  const API = "https://crm-lz8h.onrender.com/api/admin/about";
+  const API = `${API_URL}/admin/about`;
 
   const [hero,         setHero]         = useState({ heading: "", content: "", description: "" });
   const [heroOriginal, setHeroOriginal] = useState({ heading: "", content: "", description: "" });
@@ -53,48 +55,62 @@ const AdminAbout = () => {
   useEffect(() => {
     fetch(API)
       .then((r) => r.json())
-      .then((data: AboutData) => {
-        const h = { heading: data.heading, content: data.content, description: data.description };
+      .then((data: any) => {
+        const h = { heading: data.heading || "", content: data.content || "", description: data.description || "" };
         setHero(h);
         setHeroOriginal(h);
-        setCards(data.cards || []);
+        setCards(data.values || []);
       })
       .catch(() => showToast("Failed to load about data", "error"))
       .finally(() => setLoading(false));
   }, []);
 
+  // Helper to persist everything
+  const persistAll = async (nextHero = hero, nextCards = cards) => {
+    setSaving(true);
+    try {
+      const res = await fetch(API, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          heading: nextHero.heading,
+          content: nextHero.content,
+          description: nextHero.description,
+          values: nextCards
+        }),
+      });
+      if (!res.ok) throw new Error();
+      return true;
+    } catch (e) {
+      console.error(e);
+      return false;
+    } finally {
+      setSaving(false);
+    }
+  };
+
   // ── Save Hero ──────────────────────────────────────────────────────────────
   const saveHero = async () => {
     if (!hero.heading || !hero.content) { showToast("Heading and content are required", "error"); return; }
-    setSaving(true);
-    try {
-      const res = await fetch(`${API}/hero`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(hero),
-      });
-      if (!res.ok) throw new Error();
+    const success = await persistAll(hero, cards);
+    if (success) {
       setHeroOriginal({ ...hero });
       setHeroEditing(false);
       showToast("Hero section saved successfully!");
-    } catch { showToast("Failed to save hero section", "error"); }
-    finally { setSaving(false); }
+    } else {
+      showToast("Failed to save hero section", "error");
+    }
   };
 
   // ── Save Cards to DB ───────────────────────────────────────────────────────
   const persistCards = async (updated: Card[]) => {
-    setSaving(true);
-    try {
-      const res = await fetch(`${API}/cards`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ cards: updated }),
-      });
-      if (!res.ok) throw new Error();
+    const success = await persistAll(hero, updated);
+    if (success) {
       setCards(updated);
       showToast("Cards saved successfully!");
-    } catch { showToast("Failed to save cards", "error"); }
-    finally { setSaving(false); }
+    } else {
+      showToast("Failed to save cards", "error");
+    }
   };
 
   // ── Card Actions ───────────────────────────────────────────────────────────

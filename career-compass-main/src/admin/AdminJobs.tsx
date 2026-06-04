@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
@@ -31,7 +32,7 @@ export default function AdminJobs() {
   const fetchJobs = async () => {
     setLoading(true);
     try {
-      const res = await axios.get("https://crm-lz8h.onrender.com/api/jobs", {
+      const res = await axios.get(`${API_URL}/api/jobs`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setJobs(res.data);
@@ -50,7 +51,7 @@ export default function AdminJobs() {
     setSaving(true);
     try {
       await axios.post(
-        "https://crm-lz8h.onrender.com/api/jobs",
+        `${API_URL}/api/jobs`,
         { ...form, requirements: form.requirements.split(",").map((r) => r.trim()) },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -70,7 +71,7 @@ export default function AdminJobs() {
   if (!window.confirm("Are you sure you want to delete this job?")) return;
   setDeletingId(id);
   try {
-    await axios.delete(`https://crm-lz8h.onrender.com/api/jobs/${id}`, {
+    await axios.delete(`${API_URL}/api/jobs/${id}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
     setJobs((prev) => prev.filter((j) => j.id !== id));

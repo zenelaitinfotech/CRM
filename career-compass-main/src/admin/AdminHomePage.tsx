@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+import { API_URL } from "../config";
 import {
   Briefcase, MapPin, Building2, Users, Star,
   Save, RotateCcw, Pencil, X, Check,
@@ -71,7 +72,7 @@ export default function AdminHomePage() {
     const fetchJobs = async () => {
       setLoadingJobs(true);
       try {
-        const res = await axios.get("https://crm-lz8h.onrender.com/api/jobs");
+        const res = await axios.get(`${API_URL}/api/jobs`);
         const data = res.data;
         if (Array.isArray(data)) setJobs(data);
         else if (Array.isArray(data.jobs)) setJobs(data.jobs);

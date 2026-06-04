@@ -1,4 +1,4 @@
-import logo from "@/assets/logo.jpeg";
+import logo from "@/assets/logo.png";
 import { Instagram, Linkedin, Youtube, Facebook } from "lucide-react";
 import company_log from "@/assets/company_log.png";
 
@@ -32,7 +32,7 @@ export default function Footer() {
             <ul className="space-y-2 text-sm opacity-70">
               <li>📧 crmjobshopee.hr@gmail.com</li>
               <li>📞 +91 8939750730</li>
-              <li>✉️ Info@crmjobshopee.com</li>
+
             </ul>
           </div>
 

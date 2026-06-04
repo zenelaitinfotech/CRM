@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 
 interface UserType {
+  id: any;
   name: string;
   email: string;
   role: "user" | "admin";

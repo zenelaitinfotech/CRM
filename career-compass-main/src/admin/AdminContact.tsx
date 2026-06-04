@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Pencil, Save, X, Loader2 } from "lucide-react";
+import { API_URL } from "../config";
 
 interface ContactInfo {
   email: string;
@@ -19,7 +20,7 @@ const AdminContact = () => {
   const [toast, setToast] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   useEffect(() => {
-    fetch("https://crm-lz8h.onrender.com/admin/contact-info")
+    fetch(`${API_URL}/admin/contact-info`)
       .then((r) => r.json())
       .then((data) => {
         if (data?.email) { setInfo(data); setDraft(data); }
@@ -40,7 +41,7 @@ const AdminContact = () => {
     }
     setSaving(true);
     try {
-      const res = await fetch("https://crm-lz8h.onrender.com/admin/contact-info", {
+      const res = await fetch(`${API_URL}/admin/contact-info`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(draft),

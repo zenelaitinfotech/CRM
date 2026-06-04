@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useAuth } from "@/contexts/AuthContext";
 import axios from "axios";
+import { API_URL } from "../config";
 
 const Login = () => {
   const navigate = useNavigate();
@@ -20,11 +21,12 @@ const Login = () => {
     setError("");
 
     try {
-      const { data } = await axios.post("https://crm-lz8h.onrender.com/api/auth/login", { email, password });
+      const { data } = await axios.post(`${API_URL}/api/auth/login`, { email, password });
 
       // Map backend response correctly
       loginWithBackend({
         user: { 
+          id: data.user.id,
           name: data.user.name, 
           email: data.user.email, 
           role: data.user.role 

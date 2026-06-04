@@ -5,8 +5,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useAuth } from "@/contexts/AuthContext";
-
 import { toast } from "@/hooks/use-toast";
+import axios from "axios";
+import { API_URL } from "../config";
 
 interface Props {
   job: any;
@@ -15,8 +16,7 @@ interface Props {
 }
 
 export default function ApplyModal({ job, open, onClose }: Props) {
-  const { profile } = useAuth();
-  
+  const { profile, user } = useAuth();
 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
@@ -25,35 +25,73 @@ export default function ApplyModal({ job, open, onClose }: Props) {
   const [coverLetter, setCoverLetter] = useState("");
   const [salary, setSalary] = useState("");
   const [resume, setResume] = useState<string>("");
+  const [resumeFile, setResumeFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
 
   // Auto-fill when opening
   const handleOpenChange = (isOpen: boolean) => {
     if (isOpen) {
-      setName(profile.name || "");
-      setEmail(profile.email || "");
-      setPhone(profile.phone || "");
-      setLocation(profile.location || "");
-      setResume(profile.resumeName || "");
+      setName(profile?.name || "");
+      setEmail(profile?.email || "");
+      setPhone(profile?.phone || "");
+      setLocation(profile?.location || "");
+      setResume(profile?.resumeName || "");
+      setResumeFile(null);
     }
     if (!isOpen) onClose();
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const applications = JSON.parse(localStorage.getItem("jobshoppe_applications") || "[]");
-    applications.push({
-      job,
-      jobTitle: job?.title,
-      company: job?.company,
-      name, email, phone, location, coverLetter, salary, resume,
-      appliedAt: new Date().toISOString(),
-    });
-    localStorage.setItem("jobshoppe_applications", JSON.stringify(applications));
-    toast({ title: "Application Submitted! 🎉", description: `You applied for ${job?.title} at ${job?.company}.` });
-    onClose();
+    if (!job) return;
+
+    if (!user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please sign in to apply for this job.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setSubmitting(true);
+    try {
+      const formData = new FormData();
+      formData.append("jobId", job.id);
+      formData.append("candidateId", user.id);
+      formData.append("name", name);
+      formData.append("email", email);
+      formData.append("phone", phone);
+      formData.append("location", location);
+      formData.append("expectedSalary", salary);
+      formData.append("coverLetter", coverLetter);
+      formData.append("jobTitle", job.title);
+
+      if (resumeFile) {
+        formData.append("resume", resumeFile);
+      }
+
+      await axios.post(`${API_URL}/api/applications`, formData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+
+      toast({ title: "Application Submitted! 🎉", description: `You applied for ${job.title} at ${job.company}.` });
+      onClose();
+    } catch (err: any) {
+      console.error(err);
+      toast({
+        title: "Submission Failed",
+        description: err.response?.data?.message || "Something went wrong. Please try again.",
+        variant: "destructive"
+      });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
-  if (!job) return;
+  if (!job) return null;
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
@@ -94,15 +132,20 @@ export default function ApplyModal({ job, open, onClose }: Props) {
           </div>
 
           <div className="space-y-1">
-            <Label>Resume</Label>
-            {resume && <p className="text-xs text-muted-foreground">Attached: {resume}</p>}
+            <Label>Resume / CV</Label>
+            {resume && <p className="text-xs text-muted-foreground">Previously Attached: {resume}</p>}
             <Input type="file" accept=".pdf,.doc,.docx" onChange={(e) => {
               const file = e.target.files?.[0];
-              if (file) setResume(file.name);
+              if (file) {
+                setResume(file.name);
+                setResumeFile(file);
+              }
             }} />
           </div>
 
-          <Button type="submit" className="w-full">Submit Application</Button>
+          <Button type="submit" className="w-full" disabled={submitting}>
+            {submitting ? "Submitting Application..." : "Submit Application"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>

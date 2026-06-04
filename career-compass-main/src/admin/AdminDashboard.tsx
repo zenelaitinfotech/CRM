@@ -1,8 +1,16 @@
 import { useNavigate } from "react-router-dom";
-import { Briefcase, Info, Mail, User, ArrowRight, Home } from "lucide-react";
+import { Briefcase, Info, Mail, User, ArrowRight, Home, FileSpreadsheet } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 
 const cards = [
+  {
+    label:  "Applied Jobs",
+    desc:   "View candidate profiles and download CVs",
+    icon:   FileSpreadsheet,
+    path:   "/admin/applications",
+    color:  "bg-purple-50 text-purple-600",
+    border: "hover:border-purple-400",
+  },
   {
     label:  "Manage Jobs",
     desc:   "Create, edit and delete job listings",
@@ -35,14 +43,6 @@ const cards = [
     color:  "bg-orange-50 text-orange-600",
     border: "hover:border-orange-400",
   },
-  {
-    label:  "Profile",
-    desc:   "View and update your admin profile",
-    icon:   User,
-    path:   "/profile",
-    color:  "bg-purple-50 text-purple-600",
-    border: "hover:border-purple-400",
-  },
 ];
 
 const AdminDashboard = () => {
@@ -60,7 +60,7 @@ const AdminDashboard = () => {
         </p>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map(({ label, desc, icon: Icon, path, color, border }) => (
           <button
             key={path}

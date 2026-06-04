@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Search, MapPin, Briefcase, Users, Building2, MapPinIcon } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import axios from "axios";
+import { API_URL } from "../config";
 
 const ICON_MAP: Record<string, any> = {
   "Active Jobs":        Briefcase,
@@ -48,7 +49,7 @@ const Index = () => {
   useEffect(() => {
     const fetchJobs = async () => {
       try {
-        const res = await axios.get("https://crm-lz8h.onrender.com/api/jobs");
+        const res = await axios.get(`${API_URL}/api/jobs`);
         const data = res.data;
         if (Array.isArray(data)) setApiJobs(data);
         else if (Array.isArray(data.jobs)) setApiJobs(data.jobs);
@@ -81,16 +82,15 @@ const Index = () => {
   }, []);
 
   const handleApply = (job: any) => {
-  if (!user) {
-    openAuthModal(job.id);
-    return;
-  }
-  setApplyJob(job);
-};
+    setApplyJob(job);
+  };
 
   if (user && pendingApplyJobId && !applyJob) {
-    setApplyJob(pendingApplyJobId);
-    clearPendingApply();
+    const jobObj = apiJobs.find((j) => j.id === pendingApplyJobId || j._id === pendingApplyJobId);
+    if (jobObj) {
+      setApplyJob(jobObj);
+      clearPendingApply();
+    }
   }
 
   // ✅ Featured jobs — admin controlled via localStorage
@@ -252,10 +252,10 @@ const Index = () => {
 
       {/* Modals — unchanged */}
       <JobDetailModal
-        job={apiJobs.find((j) => j.id === viewJob) || null}
+        job={viewJob}
         open={!!viewJob}
         onClose={() => setViewJob(null)}
-        onApply={(id) => { setViewJob(null); handleApply(id); }}
+        onApply={(job) => { setViewJob(null); handleApply(job); }}
       />
       <ApplyModal
         job={applyJob}

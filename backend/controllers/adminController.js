@@ -80,7 +80,10 @@ export const deleteJob = (req, res) => {
 // 7️⃣ Get all applications
 export const getApplications = (req, res) => {
   const sql = `
-    SELECT a.*, j.title AS job_title, u.name AS candidate_name
+    SELECT a.*, j.title AS job_title, j.company AS job_company, 
+           u.name AS candidate_name, u.email AS candidate_email, 
+           u.phone AS candidate_phone, u.location AS candidate_location, 
+           a.resume_url AS candidate_resume
     FROM applications a
     JOIN jobs j ON a.job_id = j.id
     JOIN users u ON a.candidate_id = u.id
@@ -109,20 +112,28 @@ export const getAboutContent = (req, res) => {
 
     const data = result.rows[0];
 
+    let parsedValues = [];
+    if (data.values_json) {
+      parsedValues = typeof data.values_json === "string" 
+        ? JSON.parse(data.values_json) 
+        : data.values_json;
+    }
+
     res.json({
       heading: data.heading,
+      content: data.content,
       description: data.description,
-      values: JSON.parse(data.values_json || "[]")
+      values: parsedValues
     });
   });
 };
 
 export const updateAboutContent = (req, res) => {
-  const { heading, description, values } = req.body;
+  const { heading, content, description, values } = req.body;
 
   db.query(
-    "UPDATE about SET heading = $1, description = $2, values_json = $3 WHERE id = 1",
-    [heading, description, JSON.stringify(values)],
+    "UPDATE about SET heading = $1, content = $2, description = $3, values_json = $4 WHERE id = 1",
+    [heading, content, description, JSON.stringify(values)],
     (err) => {
       if (err) {
         console.log(err);

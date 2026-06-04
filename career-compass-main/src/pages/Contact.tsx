@@ -16,6 +16,8 @@ const contactSchema = z.object({
   message: z.string().trim().min(1, "Message is required").max(2000),
 });
 
+import { API_URL } from "../config";
+
 interface ContactInfo {
   email: string;
   phone: string;
@@ -36,9 +38,7 @@ const Contact = () => {
   });
 
   useEffect(() => {
-    fetch(process.env.NODE_ENV === "production"
-      ? "https://yourapp.onrender.com/admin/contact-info"
-      : "https://crm-lz8h.onrender.com/admin/contact-info")
+    fetch(`${API_URL}/admin/contact-info`)
       .then((r) => r.json())
       .then((data) => {
         if (data?.email && data?.phone && data?.office_address) {
